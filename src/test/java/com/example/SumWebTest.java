@@ -3,13 +3,16 @@ package com.example;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
-
-import java.io.File; // ✅ Added missing import
-import static org.junit.Assert.assertEquals;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import java.time.Duration;
 
 public class SumWebTest {
 
@@ -17,39 +20,47 @@ public class SumWebTest {
 
     @Before
     public void setUp() {
-        // Set path to chromedriver if needed
-        // Example: System.setProperty("webdriver.chrome.driver", "path/to/chromedriver.exe");
-        driver = new ChromeDriver();
+        // ✅ Chrome options for headless mode + local file access
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless=new"); // Headless mode for Jenkins
+        options.addArguments("--allow-file-access-from-files"); // Allow local file access
+        options.addArguments("--disable-gpu"); // Optional, but recommended for headless
+
+        // Initialize ChromeDriver with options
+        driver = new ChromeDriver(options);
+        driver.manage().window().maximize();
     }
 
     @Test
-    public void testSumCalculation() throws Exception {
-        // ✅ Example URL — replace with your actual one
-        driver.get("https://github.com/ShivammmKshirsagar/SeleniumWebTest/blob/main/src/test/resources/sum.html");
+    public void testSumOfTwoNumbers() throws InterruptedException {
+        // ✅ Use the correct file URL for your HTML in Jenkins workspace
+        String url = "file:///C:/ProgramData/Jenkins/.jenkins/workspace/JUnitMaven/src/test/resources/sum.html";
+        driver.get(url);
 
-        // Find input fields and button
-        WebElement num1Field = driver.findElement(By.id("num1"));
-        WebElement num2Field = driver.findElement(By.id("num2"));
-        WebElement sumButton = driver.findElement(By.id("calculate"));
-        WebElement resultField = driver.findElement(By.id("result"));
+        // Explicit wait until the first input is present
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        wait.until(ExpectedConditions.presenceOfElementLocated(By.id("num1")));
+
+        // Locate elements
+        WebElement num1 = driver.findElement(By.id("num1"));
+        WebElement num2 = driver.findElement(By.id("num2"));
+        WebElement calcButton = driver.findElement(By.id("calcBtn"));
+        WebElement result = driver.findElement(By.id("result"));
 
         // Input numbers
-        num1Field.sendKeys("5");
-        num2Field.sendKeys("7");
-        sumButton.click();
+        num1.sendKeys("10");
+        num2.sendKeys("20");
 
-        // Wait a bit for the result to update (simple delay or use WebDriverWait)
+        // Click calculate
+        calcButton.click();
+
+        // Wait for JS to update the result
         Thread.sleep(1000);
 
         // Verify result
-        String result = resultField.getText();
-        assertEquals("12", result);
-
-        // ✅ Example use of File class (to ensure File is needed)
-        File screenshotDir = new File("screenshots");
-        if (!screenshotDir.exists()) {
-            screenshotDir.mkdir();
-        }
+        String output = result.getText().trim();
+        System.out.println("Result displayed: " + output);
+        assertEquals("Sum = 30", output);
     }
 
     @After
