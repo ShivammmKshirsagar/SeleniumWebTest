@@ -20,7 +20,7 @@ public class SumWebTest {
     private WebDriverWait wait; // Reusable wait object
     
     // ✅ Define URL once
-    private final String url = "file:///C:/ProgramData/Jenkins/.jenkins/workspace/JUnitMaven/src/test/resources/sum.html";
+    private final String url = "file:///C:/ProgramData/Jenkins/.jenkins/workspace/SeleniumWebSumTest/src/test/resources/sum.html";
 
 
     @Before
